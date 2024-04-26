@@ -1,9 +1,24 @@
 package com.example.appauladb.viewModel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.appauladb.roomDB.Pessoa
+import kotlinx.coroutines.launch
 
-class PessoaViewModel(private val repository: Repository): ViewModel {
+class PessoaViewModel(private val repository: Repository): ViewModel (){
 
-    fun getPessoa() = repository.getAllPessoa().asLiveData()
+    fun getPessoa() = repository.getAllPessoa().asLiveData(viewModelScope.coroutineContext)
+
+    fun upsertPessoa(pessoa: Pessoa){
+        viewModelScope. launch {
+            repository.upsertPessoa(pessoa)
+        }
+    }
+
+    fun deletePessoa(pessoa: Pessoa){
+        viewModelScope. launch {
+            repository.deletePessoa(pessoa)
+        }
+    }
 
 }
