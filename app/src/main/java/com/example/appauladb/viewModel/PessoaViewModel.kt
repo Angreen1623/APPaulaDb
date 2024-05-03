@@ -1,6 +1,7 @@
 package com.example.appauladb.viewModel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.appauladb.roomDB.Pessoa
 import kotlinx.coroutines.launch

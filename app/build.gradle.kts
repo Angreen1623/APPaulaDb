@@ -60,8 +60,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.room.common)
-    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -72,7 +70,7 @@ dependencies {
 
     var room_version = "2.5.0"
     ksp("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room.room-ktx:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
 
-    implementation("androidx.lifecycle:lifecycle-lifedata-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
 }

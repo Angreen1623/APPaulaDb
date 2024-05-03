@@ -3,6 +3,7 @@ package com.example.appauladb
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,9 +28,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.example.appauladb.roomDB.Pessoa
 import com.example.appauladb.roomDB.PessoaDataBase
 import com.example.appauladb.ui.theme.APPaulaDbTheme
+import com.example.appauladb.viewModel.PessoaViewModel
+import com.example.appauladb.viewModel.Repository
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -39,18 +45,29 @@ class MainActivity : ComponentActivity() {
             "pessoa.bd"
         ).build()
     }
+
+    private val viewModel by viewModels<PessoaViewModel> (/*pode ser oto nome. chamar pessoa viewModel com essa variável. contém comandos do sql*/
+        factoryProducer = {
+            object : ViewModelProvider.Factory{
+                override fun <T: ViewModel> create(modelClass: Class<T>): T {//T¹ indica uma relação, T² relacionado a variavel
+                    return PessoaViewModel(Repository(db)) as T
+                }
+            }
+        }
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             APPaulaDbTheme {
-                App()
+                App(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun App() {
+fun App(viewModel: PessoaViewModel) {
     var nome by remember {
         mutableStateOf("")
     }
@@ -58,8 +75,14 @@ fun App() {
         mutableStateOf("")
     }
 
+    val pessoa = Pessoa(
+        nome,
+        telefone
+    )
+
     Column(
-        Modifier.background(Color.White)
+        Modifier
+            .background(Color.White)
             .fillMaxSize()
     ) {
         Row (
@@ -109,7 +132,9 @@ fun App() {
                 .fillMaxWidth(),
             Arrangement.Center
         ){
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = {
+                viewModel.upsertPessoa(pessoa)
+            }) {
                 Text(text = "Cadastrar")
             }
         }
@@ -128,8 +153,8 @@ fun padding(){
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun AppPreview() {
-    App()
-}
+    App(viewModel)
+}*/
