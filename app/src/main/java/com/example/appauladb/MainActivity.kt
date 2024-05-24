@@ -5,13 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -42,14 +45,14 @@ class MainActivity : ComponentActivity() {
         Room.databaseBuilder(
             applicationContext,
             PessoaDataBase::class.java,
-            "pessoa.bd"
+            "pessoa.db"
         ).build()
     }
 
-    private val viewModel by viewModels<PessoaViewModel> (/*pode ser oto nome. chamar pessoa viewModel com essa variável. contém comandos do sql*/
+    private val viewModel by viewModels<PessoaViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory{
-                override fun <T: ViewModel> create(modelClass: Class<T>): T {//T¹ indica uma relação, T² relacionado a variavel
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return PessoaViewModel(Repository(db)) as T
                 }
             }
@@ -60,17 +63,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             APPaulaDbTheme {
-                App(viewModel)
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    App(viewModel, this)
+                }
             }
         }
     }
 }
 
 @Composable
-fun App(viewModel: PessoaViewModel) {
+fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){
     var nome by remember {
         mutableStateOf("")
     }
+
     var telefone by remember {
         mutableStateOf("")
     }
@@ -80,81 +90,143 @@ fun App(viewModel: PessoaViewModel) {
         telefone
     )
 
+    var pessoaList by remember {
+        mutableStateOf(listOf<Pessoa>())
+    }
+
+    viewModel.getPessoa().observe(mainActivity){
+        pessoaList = it
+    }
+
     Column(
         Modifier
             .background(Color.White)
-            .fillMaxSize()
     ) {
-        Row (
+        Row(
             Modifier
-                .background(Color.White)
+                .padding(20.dp)
+        ){
+
+        }
+        Row(
+            Modifier
                 .fillMaxWidth(),
             Arrangement.Center
-        ) {
+        ){
             Text(
-                text = "App Cadastro Cliente",
+                text = "App DataBase",
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp
             )
         }
-
-        padding()
-
-        Row (
-            Modifier.fillMaxWidth(),
-            Arrangement.Center
+        Row(
+            Modifier
+                .padding(20.dp)
         ){
+
+        }
+        Row(
+            Modifier
+                .fillMaxWidth(),
+            Arrangement.Center
+        ) {
             TextField(
                 value = nome,
-                onValueChange = {nome = it},
-                label = {Text(text = "Nome:")},
+                onValueChange = { nome = it },
+                label = { Text(text = "Nome:") }
             )
         }
-
-        padding()
-
-        Row (
-            Modifier.fillMaxWidth(),
-            Arrangement.Center
+        Row(
+            Modifier
+                .padding(20.dp)
         ){
+
+        }
+        Row(
+            Modifier
+                .fillMaxWidth(),
+            Arrangement.Center
+        ) {
             TextField(
                 value = telefone,
-                onValueChange = {telefone = it},
-                label = {Text(text = "Telefone:")},
+                onValueChange = { telefone = it },
+                label = { Text(text = "Telefone:") }
             )
         }
-        
-        padding()
-        
-        Row (
+        Row(
+            Modifier
+                .padding(20.dp)
+        ){
+
+        }
+        Row(
             Modifier
                 .fillMaxWidth(),
             Arrangement.Center
         ){
-            Button(onClick = {
-                viewModel.upsertPessoa(pessoa)
-            }) {
+            Button(
+                onClick = {
+                    viewModel.upsertPessoa(pessoa)
+                    nome = ""
+                    telefone = ""
+                }
+            ) {
                 Text(text = "Cadastrar")
             }
         }
+        Row(
+            Modifier
+                .padding(20.dp)
+        ){
 
-
+        }
+        Row(
+            Modifier
+                .fillMaxWidth(),
+            Arrangement.Center
+        ){
+            Column(
+                Modifier
+                    .fillMaxWidth(0.5f)
+            ) {
+                Text(text = "Nome")
+            }
+            Column(
+                Modifier
+                    .fillMaxWidth(0.5f)
+            ) {
+                Text(text = "Telefone")
+            }
+        }
+        Divider()
+        LazyColumn {
+            items(pessoaList){ pessoa ->
+                Row(
+                    Modifier
+                        .clickable {
+                            viewModel.deletePessoa(pessoa)
+                        }
+                        .fillMaxWidth(),
+                    Arrangement.Center
+                ){
+                    Column(
+                        Modifier
+                            .fillMaxWidth(0.5f),
+                        Arrangement.Center
+                    ) {
+                        Text(text = "${pessoa.nome}")
+                    }
+                    Column(
+                        Modifier
+                            .fillMaxWidth(0.5f),
+                        Arrangement.Center
+                    ) {
+                        Text(text = "${pessoa.telefone}")
+                    }
+                }
+                Divider()
+            }
+        }
     }
 }
-
-@Composable
-fun padding(){
-    Row (
-        Modifier
-            .padding(20.dp)
-    ){
-
-    }
-}
-
-/*@Preview(showBackground = true)
-@Composable
-fun AppPreview() {
-    App(viewModel)
-}*/
