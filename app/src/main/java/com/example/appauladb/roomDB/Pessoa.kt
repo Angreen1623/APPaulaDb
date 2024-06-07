@@ -10,3 +10,4 @@ data class Pessoa(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 )
+//Criação do banco de dados

@@ -8,17 +8,17 @@ import kotlinx.coroutines.launch
 
 class PessoaViewModel(private val repository: Repository): ViewModel (){
 
-    fun getPessoa() = repository.getAllPessoa().asLiveData(viewModelScope.coroutineContext)
+    fun getPessoa() = repository.getAllPessoa().asLiveData(viewModelScope.coroutineContext) // retorna os valores contidos na função getAllPessoa
 
     fun upsertPessoa(pessoa: Pessoa){
         viewModelScope. launch {
-            repository.upsertPessoa(pessoa)
+            repository.upsertPessoa(pessoa) // envia a matriz pessoa para a função upsertPessoa da classe repositório
         }
     }
 
     fun deletePessoa(pessoa: Pessoa){
         viewModelScope. launch {
-            repository.deletePessoa(pessoa)
+            repository.deletePessoa(pessoa) // envia a matriz pessoa para a função deletePessoa da classe repositório
         }
     }
 

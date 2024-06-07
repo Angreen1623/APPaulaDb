@@ -53,11 +53,11 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return PessoaViewModel(Repository(db)) as T
+                    return PessoaViewModel(Repository(db)) as T //retorna o repositório que se está usando
                 }
             }
         }
-    )
+    ) //
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){
+fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){ // Cria uma instância da classe PessoaViewModel na variavel ViewModel
     var nome by remember {
         mutableStateOf("")
     }
@@ -94,8 +94,8 @@ fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){
         mutableStateOf(listOf<Pessoa>())
     }
 
-    viewModel.getPessoa().observe(mainActivity){
-        pessoaList = it
+    viewModel.getPessoa().observe(mainActivity){ // Ultiliza a variável getPessoa da classe viewModel
+        pessoaList = it                                      // Põe a lista do return na variável PessoaList
     }
 
     Column(
@@ -167,9 +167,9 @@ fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){
         ){
             Button(
                 onClick = {
-                    viewModel.upsertPessoa(pessoa)
-                    nome = ""
-                    telefone = ""
+                    viewModel.upsertPessoa(pessoa) // Quando o botão for clicado. o viewModel irá enviar o nome e o telefone para a função upsertPessoa
+                    nome = ""                      // reseta o valor de nome
+                    telefone = ""                  // reseta o valor do telefone
                 }
             ) {
                 Text(text = "Cadastrar")
@@ -201,11 +201,11 @@ fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){
         }
         Divider()
         LazyColumn {
-            items(pessoaList){ pessoa ->
+            items(pessoaList){ pessoa ->  // um foreach versão kotlin, ou seja, refaz as funções a seguir, clonando a variável pessoaList na variável pessoa
                 Row(
                     Modifier
                         .clickable {
-                            viewModel.deletePessoa(pessoa)
+                            viewModel.deletePessoa(pessoa) //Quando clicar, envia a lista pessoa para a função deletePessoa
                         }
                         .fillMaxWidth(),
                     Arrangement.Center
@@ -215,14 +215,14 @@ fun App(viewModel: PessoaViewModel, mainActivity: MainActivity){
                             .fillMaxWidth(0.5f),
                         Arrangement.Center
                     ) {
-                        Text(text = "${pessoa.nome}")
+                        Text(text = "${pessoa.nome}") // Puxa a variável nome da tabela do banco
                     }
                     Column(
                         Modifier
                             .fillMaxWidth(0.5f),
                         Arrangement.Center
                     ) {
-                        Text(text = "${pessoa.telefone}")
+                        Text(text = "${pessoa.telefone}") // Puxa a variável telefone da tabela do banco
                     }
                 }
                 Divider()
